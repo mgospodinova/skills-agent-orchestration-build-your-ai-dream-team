@@ -1,0 +1,28 @@
+{
+  "projects": [
+    {
+      "name": "Sample: Community Garden Portal",
+      "owner": "Sample owner: Alex Rivera",
+      "status": "On track",
+      "recentActivity": "Sample activity: Drafted the volunteer onboarding checklist.",
+      "priority": "Medium",
+      "summary": "Illustrative sample only. Contributors can review the onboarding flow and suggest missing steps."
+    },
+    {
+      "name": "Sample: Library Events Calendar",
+      "owner": "Sample owner: Jordan Lee",
+      "status": "At risk",
+      "recentActivity": "Sample activity: Flagged a gap in the event import requirements.",
+      "priority": "High",
+      "summary": "Illustrative sample only. Contributors can clarify import requirements and identify edge cases."
+    },
+    {
+      "name": "Sample: Neighborhood Tool Share",
+      "owner": "Sample owner: Casey Morgan",
+      "status": "In progress",
+      "recentActivity": "Sample activity: Added an initial inventory category list.",
+      "priority": "Low",
+      "summary": "Illustrative sample only. Contributors can suggest useful categories and lending details."
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A clear view of project ownership, progress, activity, and priority.">
+    <title>Project Pulse</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module">
+      const dashboard = document.querySelector(".dashboard");
+      const loadingState = document.querySelector("#project-state");
+
+      function displayValue(value) {
+        if (value === null || value === undefined || String(value).trim() === "") {
+          return "Not provided";
+        }
+        return String(value);
+      }
+
+      function makeField(tagName, className, label, value) {
+        const field = document.createElement(tagName);
+        field.className = className;
+        const fieldLabel = document.createElement("strong");
+        fieldLabel.textContent = `${label}: `;
+        field.append(fieldLabel, document.createTextNode(displayValue(value)));
+        return field;
+      }
+
+      function makeProjectCard(project) {
+        const card = document.createElement("article");
+        card.className = "project-card";
+
+        const name = document.createElement("h2");
+        name.className = "project-name";
+        name.textContent = displayValue(project.name);
+
+        const status = makeField("p", "project-status", "Status", project.status);
+        const statusKey = displayValue(project.status).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        if (statusKey) {
+          status.dataset.status = statusKey;
+          status.classList.add(statusKey);
+        }
+
+        const priority = makeField("p", "project-priority", "Priority", project.priority);
+        const priorityKey = displayValue(project.priority).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        if (priorityKey) {
+          priority.dataset.priority = priorityKey;
+          priority.classList.add(priorityKey);
+        }
+
+        card.append(
+          name,
+          status,
+          priority,
+          makeField("p", "project-owner", "Owner", project.owner),
+          makeField("p", "project-activity", "Recent activity", project.recentActivity)
+        );
+
+        if (project.summary !== null && project.summary !== undefined && String(project.summary).trim() !== "") {
+          card.append(makeField("p", "project-summary", "Summary", project.summary));
+        }
+
+        return card;
+      }
+
+      async function loadProjects() {
+        try {
+          const response = await fetch("project-data.json");
+          if (!response.ok) {
+            throw new Error(`The server responded with ${response.status}.`);
+          }
+
+          const data = await response.json();
+          if (!data || !Array.isArray(data.projects)) {
+            throw new Error("The data must contain a projects array.");
+          }
+          if (data.projects.some((project) => !project || typeof project !== "object" || Array.isArray(project))) {
+            throw new Error("Every project entry must be an object.");
+          }
+
+          loadingState.hidden = true;
+          if (data.projects.length === 0) {
+            loadingState.textContent = "No projects yet. Check back when a project has been added.";
+            loadingState.hidden = false;
+            return;
+          }
+
+          data.projects.forEach((project) => dashboard.append(makeProjectCard(project)));
+
+          if (!dashboard.querySelector(".project-card")) {
+            loadingState.textContent = "No projects yet. Check back when a project has been added.";
+            loadingState.hidden = false;
+          }
+        } catch (error) {
+          loadingState.textContent = `Project data could not be loaded or parsed. ${error.message} Check the data file and reload.`;
+          loadingState.setAttribute("role", "alert");
+        }
+      }
+
+      loadProjects();
+    </script>
+  </head>
+  <body>
+    <main class="dashboard" aria-labelledby="page-title">
+      <header>
+        <p>PROJECT OVERVIEW</p>
+        <h1 id="page-title">Project Pulse</h1>
+        <p>A current view of ownership, progress, and what needs attention.</p>
+      </header>
+      <p id="project-state" role="status" aria-live="polite">Loading projects…</p>
+    </main>
+  </body>
+</html>
